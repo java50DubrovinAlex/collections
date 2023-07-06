@@ -40,9 +40,27 @@ abstract class ListTest extends CollectionTest {
 	}
 	@Test
 	void indexOfTest() {
-		assertEquals(6, list.indexOf(100));
+		list.add(5, 100);
+		assertEquals(5, list.indexOf(100));
 		assertEquals(-1, list.indexOf(100000));
 	}
-	
+	@Test
+	void lastIndexOfTest() {
+		list.add(5, 100);
+		assertEquals(7, list.lastIndexOf(100));
+		assertEquals(-1, list.indexOf(100000));
+	}
+	@Test
+	void removeTest() {
+		Integer [] expected = {-20, 8, 14, 30, 12, 100};
+		Integer obj = 10;
+		assertTrue(list.remove(obj));
+		assertArrayEquals(expected, list.toArray(new Integer[0]));
+		
+	}
+	@Test
+	void containsTest() {
+		assertTrue(list.contains(-20));
+	}
 
 }
