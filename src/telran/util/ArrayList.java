@@ -139,13 +139,7 @@ public class ArrayList<T> implements List<T> {
 		return res;
 	}
 
-	private void indexValidation(int index, boolean sizeInclusive) {
-		int bounder = sizeInclusive ? size : size - 1;
-		if (index < 0 || index > bounder ) {
-			throw new IndexOutOfBoundsException(index);
-		}
-		
-	}
+	
 	@Override
 	public int indexOf(Object pattern) {
 		

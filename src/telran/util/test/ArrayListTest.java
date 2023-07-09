@@ -8,9 +8,9 @@ import telran.util.Collection;
 public class ArrayListTest extends ListTest {
 
 	@Override
-	protected Collection<Integer> getCollection(Integer[] ar1) {
+	protected Collection<Integer> getCollection(Integer[] ar) {
 		ArrayList<Integer> arrayList = new ArrayList<>();
-		for(Integer num: ar1) {
+		for(Integer num: ar) {
 			arrayList.add(num);
 		}
 		return arrayList;
