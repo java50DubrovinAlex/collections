@@ -37,8 +37,7 @@ public interface Collection<T> extends Iterable<T>{
 		Iterator<T> it = iterator();
 		int oldSize = size();
 		while(it.hasNext()) {
-			T next = it.next();
-			if(predicate.test(next)) {
+			if(predicate.test(it.next())) {
 				it.remove();
 			}
 		}

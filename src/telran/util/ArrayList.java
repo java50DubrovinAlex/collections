@@ -60,26 +60,20 @@ public class ArrayList<T> implements List<T> {
 	
    @Override
    public boolean removeIf(Predicate<T> predicate) {
-	   boolean [] isRemovdeElement = new boolean [size];
-	   int newIndex = 0;
-	   int newSize = size;
-	   boolean removed = false; 
-	   for(int i = 0; i < size; i++) {
-		   if(predicate.test(array[i])) {
-			   isRemovdeElement[i] = true;
-			   newSize--;
-			   removed = true;
-		   }
-	   }
-	   
-	   for(int i = 0; i < size;i++) {
-		   if(!isRemovdeElement[i]) {
-			   array[newIndex] = array[i];
-			   newIndex++;
-		   }
-	   }
-	   size = newSize;
-	   return removed;
+	   int oldSize = size;
+		int indexDest = 0;
+		for(int indexSrc = 0; indexSrc < oldSize; indexSrc++) {
+			if (predicate.test(array[indexSrc])) {
+				size--;
+			} else {
+				array[indexDest++] = array[indexSrc];
+			}
+		}
+		for (int i = size; i < oldSize; i++) {
+			array[i] = null;
+		}
+		return oldSize > size;
+	  
    }
 	
 
@@ -140,17 +134,7 @@ public class ArrayList<T> implements List<T> {
 	}
 
 	
-	@Override
-	public int indexOf(Object pattern) {
-		
-		return indexOf(Predicate.isEqual(pattern));
-	}
-
-	@Override
-	public int lastIndexOf(Object pattern) {
-		
-		return lastIndexOf(Predicate.isEqual(pattern));
-	}
+	
 
 	@Override
 	public int indexOf(Predicate<T> predicate) {

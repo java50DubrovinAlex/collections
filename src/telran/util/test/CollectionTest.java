@@ -3,6 +3,9 @@ package telran.util.test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Random;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +14,9 @@ import telran.util.Collection;
 
 abstract class CollectionTest {
 Integer [] numbers = {10, -20, 8, 14, 30, 12, 100};
-Collection<Integer> collection;
+static final int N_BIG_NUMBERS = 100_000;
+static final int N_RUNS = 1000;
+protected Collection<Integer> collection;
 	@BeforeEach
 	void setUp()  {
 		for(Integer num: numbers) {
@@ -27,13 +32,13 @@ Collection<Integer> collection;
 		 Integer[] expected2 = {-20, 8, 14, 30, 12};
 		 Integer[] expected3 = {-20, 8,  30, 12};
 		 assertTrue(collection.remove(10));
-		 assertArrayEquals(expected1, collection.toArray(new Integer[0]));
+		 runArrayTest(expected1, collection.toArray(new Integer[0]));
 		 assertTrue(collection.remove(100));
-		 assertArrayEquals(expected2, collection.toArray(new Integer[0]));
+		 runArrayTest(expected2, collection.toArray(new Integer[0]));
 		 assertTrue(collection.remove(14));
-		 assertArrayEquals(expected3, collection.toArray(new Integer[0]));
+		 runArrayTest(expected3, collection.toArray(new Integer[0]));
 		 assertFalse(collection.remove(100000));
-		 assertArrayEquals(expected3, collection.toArray(new Integer[0]));
+		 runArrayTest(expected3, collection.toArray(new Integer[0]));
 	 }
 	 @Test
 	 void clearTest() {
@@ -61,21 +66,21 @@ Collection<Integer> collection;
 		 Integer[] actual = collection.toArray(ar);
 		 assertTrue(ar == actual);
 		 assertNull(actual[collection.size()]);
-		 assertArrayEquals(numbers, Arrays.copyOf(actual, collection.size()));
+		 runArrayTest(numbers, Arrays.copyOf(actual, collection.size()));
 		 
 	 }
 	 @Test
 	 void removeIfTest() {
 		 Integer [] expected = {10, -20, 8, 14,  12};
 		 assertTrue(collection.removeIf(num -> num >= 30));
-		 assertArrayEquals(expected, collection.toArray(new Integer[0]));
+		 runArrayTest(expected, collection.toArray(new Integer[0]));
 	 }
 	 @Test
 	 void addAllTest() {
 		 Integer [] ar = {1, 11};
 		 Integer [] expected = {10, -20, 8, 14, 30, 12, 100, 1, 11};
 		 assertTrue(collection.addAll(getCollection(ar)));
-		 assertArrayEquals(expected, collection.toArray(new Integer[0]));
+		 runArrayTest(expected, collection.toArray(new Integer[0]));
 	 }
 	 @Test
 	 void removeAllTest() {
@@ -84,8 +89,38 @@ Collection<Integer> collection;
 		 Integer [] expected = { 8, 14, 30, 12, 100};
 		 assertTrue(collection.removeAll(col1));
 		 assertFalse(collection.removeAll(col1));
-		 assertArrayEquals(expected, collection.toArray(new Integer[0]));
+		 runArrayTest(expected, collection.toArray(new Integer[0]));
+	 }
+	 @Test
+	 void removeIfPerformanceTest() {
+		 Integer[] bigArray = getBigArray();
+		 Collection<Integer> bigCollection = null;
+		 for(int i = 0; i < N_RUNS; i++) {
+			 bigCollection = getCollection(bigArray);
+			  bigCollection.clear();
+			  assertEquals(0, bigCollection.size());
+		 }
+		 
+		
+	 }
+	 @Test
+	 void iteratorTest() {
+		 Iterator<Integer> it = collection.iterator();
+		 while(it.hasNext()) {
+			 it.next();
+		 }
+		 assertThrowsExactly(NoSuchElementException.class, ()->it.next());
 	 }
 
+	private Integer[] getBigArray() {
+		Integer[] res = new Integer[N_BIG_NUMBERS];
+		Random gen = new Random();
+		for(int i = 0; i < N_BIG_NUMBERS; i++) {
+			res[i] = gen.nextInt();
+		}
+		return res;
+	}
+
 	protected abstract Collection<Integer> getCollection(Integer[] ar1);
+	protected abstract void runArrayTest(Integer[] expected, Integer[] actual) ;
 }
