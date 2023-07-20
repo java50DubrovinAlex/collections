@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
-public class LinkedList<T> implements List<T> {
+public class LinkedList<T> implements List<T>, Cloneable {
 	private static class Node<T> {
 		T obj;
 		Node<T> next;
@@ -226,6 +226,18 @@ public class LinkedList<T> implements List<T> {
 			index--;
 		}
 		return current == null ? -1 : index;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return listEqualsTo(obj);
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+		// TODO Fix this method to return Shallow Copy of this collection
+		LinkedList<T> clonLinkedList = new LinkedList<T>();
+		return clonLinkedList = this;
 	}
 
 }

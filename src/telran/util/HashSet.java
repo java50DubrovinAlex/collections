@@ -4,64 +4,144 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class HashSet<T> implements Set<T> {
+public class HashSet<T> implements Set<T>, Cloneable {
 	private static final int DEFAULT_TABLE_LENGTH = 16;
 	private LinkedList<T>[] hashTable;
 	private float factor = 0.75f;
 	private int size;
+
 	@SuppressWarnings("unchecked")
 	public HashSet(int tableLength) {
 		hashTable = new LinkedList[tableLength];
 	}
+
 	public HashSet() {
 		this(DEFAULT_TABLE_LENGTH);
 	}
+
+	private class HashSetIterator implements Iterator<T> {
+		Integer currentIteratorIndex;
+		Iterator<T> currentIterator;
+		Iterator<T> prevIterator;
+		boolean flNext = false;
+
+		HashSetIterator() {
+			initialState();
+		}
+
+		private void initialState() {
+			currentIteratorIndex = getCurrentIteratorIndex(-1);
+			if (currentIteratorIndex > -1) {
+				currentIterator = hashTable[currentIteratorIndex].iterator();
+
+			}
+
+		}
+
+		private int getCurrentIteratorIndex(int currentIndex) {
+			currentIndex++;
+			while (currentIndex < hashTable.length
+					&& (hashTable[currentIndex] == null || hashTable[currentIndex].size() == 0)) {
+				currentIndex++;
+			}
+			return currentIndex < hashTable.length ? currentIndex : -1;
+		}
+
+		@Override
+		public boolean hasNext() {
+
+			return currentIteratorIndex >= 0;
+		}
+
+		@Override
+		public T next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			T res = currentIterator.next();
+			prevIterator = currentIterator;
+			updateState();
+			flNext = true;
+			return res;
+		}
+
+		private void updateState() {
+			if (!currentIterator.hasNext()) {
+				currentIteratorIndex = getCurrentIteratorIndex(currentIteratorIndex);
+				if (currentIteratorIndex >= 0) {
+					currentIterator = hashTable[currentIteratorIndex].iterator();
+				}
+			}
+
+		}
+
+		@Override
+		public void remove() {
+			if (!flNext) {
+				throw new IllegalStateException();
+			}
+			prevIterator.remove();
+			size--;
+			flNext = false;
+		}
+
+	}
+
 	@Override
 	public boolean add(T obj) {
-		if ((float)size / hashTable.length >= factor) {
-			hashTableRecreation();
-		}
-		int index = getIndex(obj);
-		LinkedList<T> list = null;
-		if (hashTable[index] == null) {
-			hashTable[index] = new LinkedList<>();
-		}
-		list = hashTable[index];
 		boolean res = false;
-		if(!list.contains(obj)) {
-			res = true;
-			list.add(obj);
+		if (!contains(obj)) {
+			if (((float) size / hashTable.length) >= factor) {
+				hashTableRecreation();
+
+			}
+			addHashTable(obj, hashTable);
 			size++;
+			res = true;
 		}
+		
 		return res;
 	}
 
 	private void hashTableRecreation() {
-		HashSet<T> tmp = new HashSet<>(hashTable.length * 2);
-		for(LinkedList<T> list: hashTable) {
-			if(list != null) {
-				for(T obj: list) {
-					tmp.add(obj);
+		@SuppressWarnings("unchecked")
+		LinkedList<T>[] tmp = new LinkedList[hashTable.length * 2];
+		for (LinkedList<T> list : hashTable) {
+			if (list != null) {
+				for (T obj : list) {
+					addHashTable(obj, tmp);
 				}
 			}
-		};
-		
-		hashTable = tmp.hashTable;
-		
+		}
+		;
+
+		hashTable = tmp;
+
 	}
+
+	private void addHashTable(T obj, LinkedList<T>[] tmp) {
+		int index = Math.abs(obj.hashCode() % tmp.length);
+		if (tmp[index] == null) {
+			tmp[index] = new LinkedList<>();
+		}
+		tmp[index].add(obj);
+
+	}
+
 	private int getIndex(Object obj) {
 		int hashCode = obj.hashCode();
-		
+
 		return Math.abs(hashCode) % hashTable.length;
 	}
+
 	@Override
 	public boolean remove(Object pattern) {
 		int index = getIndex(pattern);
 		boolean res = false;
 		LinkedList<T> list = hashTable[index];
-		if(list != null) {
+		if (list != null) {
 			res = list.remove(pattern);
-			if(res) {
+			if (res) {
 				size--;
 			}
 		}
@@ -73,7 +153,7 @@ public class HashSet<T> implements Set<T> {
 		int index = getIndex(pattern);
 		boolean res = false;
 		LinkedList<T> list = hashTable[index];
-		if(list != null) {
+		if (list != null) {
 			res = list.contains(pattern);
 		}
 		return res;
@@ -81,64 +161,14 @@ public class HashSet<T> implements Set<T> {
 
 	@Override
 	public int size() {
-		
+
 		return size;
 	}
 
 	@Override
 	public Iterator<T> iterator() {
-		
-		
+
 		return new HashSetIterator();
-	}
-	private class HashSetIterator implements  Iterator<T>{
-		int currentIndex = 0;
-	    boolean canRemove = false;
-	    Iterator<T> currentIterator = null;
-
-	    @Override
-	    public boolean hasNext() {
-	    	while (currentIndex < hashTable.length && (currentIterator == null || !currentIterator.hasNext())) {
-	            LinkedList<T> list = hashTable[currentIndex++];
-	            if (list != null) {
-	                currentIterator = list.iterator();
-	            }
-	        }
-	        return currentIndex < hashTable.length && currentIterator.hasNext();
-	    }
-//	    private boolean findeNext(LinkedList<T> list) {
-//	    	currentIterator = list.iterator();
-//	    	while(currentIterator.hasNext()) {
-//	    		return true;
-//	    	}
-//			return false;
-//	    	
-//	    }
-
-	    @Override
-	    public T next() {
-	        if (!hasNext()) {
-	            throw new NoSuchElementException();
-	        }
-	        canRemove = true;
-//	        LinkedList<T> list = hashTable[currentIndex];
-//	        currentIterator = list.iterator();
-	        return currentIterator.next();
-	    }
-
-	    @Override
-	    public void remove() {
-	        if (!canRemove) {
-	            throw new IllegalStateException();
-	        }
-	       
-	        currentIterator.remove();
-	        canRemove = false;
-	        size--;
-//	        if(!currentIterator.hasNext()) {
-//	        	size--;
-//	        }
-	    }
 	}
 
 	@Override
@@ -146,16 +176,29 @@ public class HashSet<T> implements Set<T> {
 		int index = getIndex(pattern);
 		T res = null;
 		LinkedList<T> list = hashTable[index];
-		if(list != null) {
+		if (list != null) {
 			Iterator<T> it = list.iterator();
-			while(it.hasNext() && res == null) {
+			while (it.hasNext() && res == null) {
 				T obj = it.next();
-				if(Objects.equals(pattern, obj)) {
+				if (Objects.equals(pattern, obj)) {
 					res = obj;
-				};
+				}
+				;
 			}
 		}
 		return res;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return setEqualsTo(obj);
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+		// TODO Fix this method to return Shallow Copy of this collection
+		HashSet<T>clonHashSet = new HashSet<T>();
+		return clonHashSet = this;
 	}
 
 }

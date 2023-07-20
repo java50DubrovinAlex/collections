@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 @SuppressWarnings("unchecked")
-public class ArrayList<T> implements List<T> {
+public class ArrayList<T> implements List<T>, Cloneable {
 	private static final int DEFAULT_CAPACITY = 16;
 	private T[] array;
 	private int size = 0;
@@ -160,6 +160,23 @@ public class ArrayList<T> implements List<T> {
 			index--;
 		}
 		return res;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return listEqualsTo(obj);
+	}
+
+//	@Override
+//	public Object clone() throws CloneNotSupportedException{
+//		// TODO Fix this method to return Shallow Copy of this collection
+//		return super.clone();
+//	}
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+		// TODO Fix this method to return Shallow Copy of this collection
+		ArrayList<T> clonArrayList = new ArrayList<T>();
+		return clonArrayList = this;
 	}
 
 }
