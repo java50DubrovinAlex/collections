@@ -117,7 +117,7 @@ private static boolean subAndStrItr(String str, String sub, int strIndex, int su
 	if( subIndex >= sub.length()) {
 		return true;
 	}
-	if(strIndex >= str.length() || str.charAt(strIndex) != sub.charAt(subIndex)) {
+	if(str.charAt(strIndex) != sub.charAt(subIndex)) {
 		return false;
 	}
 	return subAndStrItr(str, sub, strIndex + 1, subIndex + 1);
