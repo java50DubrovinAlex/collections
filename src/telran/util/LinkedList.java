@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
-public class LinkedList<T> implements List<T>, Cloneable {
-	private static class Node<T> {
+public class LinkedList<T> implements List<T> {
+	static class Node<T> {
 		T obj;
 		Node<T> next;
 		Node<T> prev;
@@ -16,7 +16,7 @@ public class LinkedList<T> implements List<T>, Cloneable {
 	Node<T> head;
 	Node<T> tail;
 	int size;
-	private class LinkedListIterator implements Iterator<T> {
+	public class LinkedListIterator implements Iterator<T> {
 		Node<T> current = head;
 		boolean flNext = false;
 			@Override
@@ -54,7 +54,7 @@ public class LinkedList<T> implements List<T>, Cloneable {
 		return true;
 	}
 
-	private void removeNode(Node<T> removedNode) {
+	public void removeNode(Node<T> removedNode) {
 		if(removedNode == head) {
 			removeHead();
 		} else if(removedNode == tail) {
@@ -98,7 +98,7 @@ public class LinkedList<T> implements List<T>, Cloneable {
 		
 	}
 
-	private void addNode(int index, Node<T> node) {
+	public void addNode(int index, Node<T> node) {
 		
 		if(index == size) {
 			addTail(node);
@@ -129,7 +129,7 @@ public class LinkedList<T> implements List<T>, Cloneable {
 		
 	}
 
-	private void addTail(Node<T> node) {
+	public void addTail(Node<T> node) {
 		if (tail == null) {
 			head = tail = node;
 		} else {
@@ -226,18 +226,6 @@ public class LinkedList<T> implements List<T>, Cloneable {
 			index--;
 		}
 		return current == null ? -1 : index;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return listEqualsTo(obj);
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException{
-		// TODO Fix this method to return Shallow Copy of this collection
-		LinkedList<T> clonLinkedList = new LinkedList<T>();
-		return clonLinkedList = this;
 	}
 
 }

@@ -1,105 +1,102 @@
 package telran.util.test;
 
+import telran.util.TreeSet;
+
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import telran.util.ArrayList;
 import telran.util.Collection;
-import telran.util.TreeSet;
+import telran.util.List;
 
-class TreeSetTest extends SetTest {
-
+public class TreeSetTest extends SortedSetTest {
 	TreeSet<Integer> treeSet;
-	
-	@Override
 	@BeforeEach
+	@Override
 	void setUp() {
-		treeSet = new TreeSet<Integer>();
-		collection = treeSet;
+		collection = new TreeSet<>();
 		super.setUp();
-
+		treeSet = (TreeSet<Integer>) collection;
 	}
 
 	@Override
 	protected Collection<Integer> getCollection(Integer[] ar) {
 		TreeSet<Integer> res = new TreeSet<>();
-		for (Integer num : ar) {
+		for(Integer num: ar) {
 			res.add(num);
 		}
 		return res;
 	}
-
-	@Override
-	protected void runArrayTest(Integer[] expected, Integer[] actual) {
-		Integer[] expectedSorted = Arrays.copyOf(expected, expected.length);
-		Integer[] actualSorted = Arrays.copyOf(actual, actual.length);
-		Arrays.sort(expectedSorted);
-		assertArrayEquals(expectedSorted, actualSorted);
-
-	}
-
 	@Test
-	void getNodeTest() {
-		assertTrue(collection.contains(numbers[0]));
-		assertTrue(collection.contains(10));
-		assertFalse(collection.contains(500));
-		collection.clear();
-		assertFalse(collection.contains(10));
+	void displayRotatedTest() {
+		treeSet.setSpacesPerLevel(4);
+		treeSet.displayRotated();
 	}
-
 	@Test
-	void firstTest() {
-		assertEquals(Integer.valueOf(-20), treeSet.first());
-		collection.clear();
-		assertNull(treeSet.first());
+	void widthTest() {
+		assertEquals(3, treeSet.width());
 	}
-
 	@Test
-	void lastTest() {
-		assertEquals(Integer.valueOf(100), treeSet.last());
-		collection.clear();
-		assertNull(treeSet.last());
+	void heightTest() {
+		assertEquals(4, treeSet.height());
 	}
-
 	@Test
-	void ceilingTest() {
-		assertEquals(Integer.valueOf(-20), treeSet.ceiling(-30));
-		assertEquals(Integer.valueOf(-20), treeSet.ceiling(-20));
-		assertEquals(Integer.valueOf(100), treeSet.ceiling(80));
-		assertEquals(Integer.valueOf(100), treeSet.ceiling(100));
-		assertNull(treeSet.ceiling(200));
-		collection.clear();
-		assertNull(treeSet.ceiling(1));
+	void balanceTest() {
+		treeSet.balance();
+		assertEquals(4, treeSet.width());
+		assertEquals(3, treeSet.height());
+	}
+	@Test
+	void balanceTestArray() {
+		Integer[] array = new Integer[1023];
+		for(int i = 0; i < array.length; i++) {
+			array[i] = i;
+		}
+		reorderArray(array);
+		TreeSet<Integer> tree = new TreeSet<>();
+		for(Integer num: array) {
+			tree.add(num);
+		}
+		assertEquals(512, tree.width());
+	}
+//	
+	public void reorderArray(Integer[] array) {
+		// TODO Auto-generated method stub
+		List<Integer>reorderArray = new ArrayList<Integer>();
+		reorderArray(array, 0, array.length-1, reorderArray);
+		int index = 0;
+		for(int elm:reorderArray) {
+			array[index++] = elm;
+		}
+		
+		
+		
 	}
 	
-	@Test
-	void floorTest() {
-		assertEquals(Integer.valueOf(100), treeSet.floor(200));
-		assertEquals(Integer.valueOf(100), treeSet.floor(100));
-		assertEquals(Integer.valueOf(30), treeSet.floor(80));
-		assertEquals(Integer.valueOf(-20), treeSet.floor(-20));
-		assertNull(treeSet.floor(-30));
-		collection.clear();
-		assertNull(treeSet.ceiling(1));
+	public void reorderArray(Integer[] array, int left, int right,List <Integer>reorderArray ) {
+		if(left<=right) {
+			int root = (left + right) / 2;
+			reorderArray.add(array[root]);
+		 reorderArray(array, left, root - 1, reorderArray);
+		 reorderArray(array, root + 1, right, reorderArray);
+		}
+		
+		
 	}
-
-	@Test
-	void headSetCopyTest() {
-		// TODO check method headSetCopy
-		fail();
-	}
+//	
 	
 	@Test
-	void tailSetCopyTest() {
-		// TODO check method tailSetCopy
-		fail();
+	void inverseTest() {
+		Integer[] expected = {100, 30, 14, 12, 10, 8, -20   };
+		treeSet.inverse();
+		treeSet.setSpacesPerLevel(4);
+		treeSet.displayRotated();
+		assertArrayEquals(expected, treeSet.toArray(new Integer[0]));
+		
+//		assertTrue(treeSet.contains(100));
 	}
+	
 
-	@Test
-	void subSetCopyTest() {
-		// TODO check method subSetCopy
-		fail();
-	}
 }
